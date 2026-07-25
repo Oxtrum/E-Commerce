@@ -18,6 +18,31 @@ Construir una SPA modular que cubra:
 - Promociones, cupones y descuentos.
 - Backoffice de catálogo, clientes, pedidos, pagos, facturas y reportes.
 
+## Estado actual
+
+Este README describe sobre todo el **destino**. Lo construido hasta ahora es la
+Fase 2 parcial:
+
+| Superficie | Estado |
+|---|---|
+| Tienda (`/`) | Hero, buscador con debounce, grilla de productos, pasos de compra, FAQ |
+| `/plataforma` | Pagina de presentacion, enlazada desde el pie ("Vende con nosotros") |
+| `404` | Listo |
+| Catalogo (`/catalogo`, `/producto/:slug`) | No implementado |
+| Carrito y checkout | No implementado |
+| Area de cliente (`/mi-cuenta/*`) | No implementado |
+| Backoffice (`/admin/*`) | No implementado |
+
+Existe una porcion minima de catalogo de solo lectura respetando el layering:
+`types/catalogo.ts` -> `services/catalogo.ts` -> `hooks/useCatalogo.ts`. Usa
+`VITE_ORGANIZACION_SLUG`; si queda vacia, la API responde `400` en cada peticion y
+la tienda aparece sin productos.
+
+No hay imagenes de producto reales. Los espacios sin `imagenPrincipal` usan un
+marcador generado con CSS, y la ilustracion del hero (`components/store/HeroArt.tsx`)
+es un SVG en linea construido con los tokens del tema, de modo que responde al modo
+claro y oscuro sin archivos externos.
+
 ## Arquitectura del ecosistema
 
 ```text
@@ -333,6 +358,23 @@ Reglas críticas:
 - Los errores por campo devueltos por la API deben mapearse al formulario cuando el contrato los incluya.
 
 ## Diseño y componentes
+
+Los tokens viven en `src/index.css` y se declaran en **OKLCH**, no en hex. La paleta
+es cálida —espresso, ámbar y arena— con un contrapunto frío (`--teal`, matiz 195) que
+evita que todo caiga en la misma familia de matices y se vea plano.
+
+Dos reglas que no se pueden romper, medidas con contraste real:
+
+- **`--accent` es superficie, nunca texto** (2.13:1). Para texto usa `--accent-strong` (5.53:1).
+- **`--border` es decorativo** (1.38:1). Los bordes de controles usan `--border-strong` (3.81:1), que sí cumple el 3:1 de WCAG 1.4.11.
+
+Las escalas verificadas de estados, los planos de componentes y las reglas de
+redacción están en `.agents/skills/ecommerce-ui-design`. La §2.6 cubre la voz: frases
+simples antes que ingeniosas, títulos de sección como preguntas o etiquetas llanas,
+pasos en imperativo, y nunca prometer comportamiento que el sistema no tiene.
+
+Hay utilidades propias en `index.css`: `.grain`, `.text-gradient-warm`, `.sheen`,
+`.animate-float` y `.animate-marquee`, todas anuladas bajo `prefers-reduced-motion`.
 
 La base visual conserva Tailwind CSS, shadcn/ui, Radix UI e Inter. Deben reutilizarse patrones equivalentes a `Inventarios-Front`:
 
