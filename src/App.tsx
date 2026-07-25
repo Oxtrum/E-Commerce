@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/sonner"
 import { ThemeProvider } from "@/context/theme-provider"
 import { queryClient } from "@/lib/query-client"
 import HomePage from "@/pages/home"
+import PlataformaPage from "@/pages/plataforma"
 import NotFoundPage from "@/pages/not-found"
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
             <Routes>
               <Route element={<StoreLayout />}>
                 <Route index element={<HomePage />} />
+                <Route path="plataforma" element={<PlataformaPage />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Route>
             </Routes>
