@@ -22,8 +22,12 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-accent-strong: var(--accent-strong);
+  --color-teal: var(--teal);
+  --color-teal-foreground: var(--teal-foreground);
   --color-destructive: var(--destructive);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-input: var(--input);
   --color-ring: var(--ring);
   --radius-sm: calc(var(--radius) * 0.6);
@@ -34,47 +38,76 @@
   --radius-3xl: calc(var(--radius) * 2.2);
 }
 
+/*
+  Paleta "mercado": arcilla profunda + caléndula saturada, con un verde azulado
+  como contrapunto frío. Todos los valores estan dentro de gamut sRGB y sus
+  contrastes fueron medidos (ver .agents/skills/ecommerce-ui-design).
+
+  Regla de uso:
+  - --accent es una superficie de relleno, nunca color de texto (2.13:1 sobre
+    el fondo). Para texto o iconos en tono caléndula usar --accent-strong.
+  - --border es para divisores decorativos. El limite de un control
+    interactivo usa --border-strong, que si alcanza 3:1.
+*/
 :root {
-  --background: oklch(0.99 0.003 80);
-  --foreground: oklch(0.18 0.01 60);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.01 60);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.01 60);
-  --primary: oklch(0.26 0.04 55);
-  --primary-foreground: oklch(0.98 0.01 80);
-  --secondary: oklch(0.95 0.015 80);
-  --secondary-foreground: oklch(0.26 0.04 55);
-  --muted: oklch(0.96 0.01 80);
-  --muted-foreground: oklch(0.5 0.02 60);
-  --accent: oklch(0.9 0.08 75);
-  --accent-foreground: oklch(0.23 0.04 55);
-  --destructive: oklch(0.58 0.24 27);
-  --border: oklch(0.9 0.015 75);
-  --input: oklch(0.9 0.015 75);
-  --ring: oklch(0.65 0.12 65);
-  --radius: 0.625rem;
+  --background: oklch(0.985 0.014 85);
+  --foreground: oklch(0.2 0.032 45);
+  --card: oklch(0.99 0.008 85);
+  --card-foreground: oklch(0.2 0.032 45);
+  --popover: oklch(0.99 0.008 85);
+  --popover-foreground: oklch(0.2 0.032 45);
+  --primary: oklch(0.38 0.115 32);
+  --primary-foreground: oklch(0.98 0.018 85);
+  --secondary: oklch(0.93 0.035 80);
+  --secondary-foreground: oklch(0.3 0.06 40);
+  --muted: oklch(0.955 0.022 82);
+  --muted-foreground: oklch(0.45 0.038 50);
+  --accent: oklch(0.76 0.165 68);
+  --accent-foreground: oklch(0.24 0.055 45);
+  --accent-strong: oklch(0.52 0.128 52);
+  --teal: oklch(0.52 0.078 195);
+  --teal-foreground: oklch(0.98 0.018 85);
+  --destructive: oklch(0.55 0.215 25);
+  --border: oklch(0.88 0.028 78);
+  --border-strong: oklch(0.6 0.042 68);
+  --input: oklch(0.88 0.028 78);
+  --ring: oklch(0.58 0.13 52);
+  --radius: 0.75rem;
+
+  --shadow-warm-sm: 0 1px 2px oklch(0.3 0.06 40 / 0.06);
+  --shadow-warm: 0 4px 16px -4px oklch(0.3 0.06 40 / 0.12);
+  --shadow-warm-lg: 0 16px 40px -12px oklch(0.3 0.06 40 / 0.22);
+  --shadow-glow: 0 8px 32px -8px oklch(0.76 0.165 68 / 0.45);
 }
 
 .dark {
-  --background: oklch(0.16 0.015 55);
-  --foreground: oklch(0.96 0.01 80);
-  --card: oklch(0.21 0.02 55);
-  --card-foreground: oklch(0.96 0.01 80);
-  --popover: oklch(0.21 0.02 55);
-  --popover-foreground: oklch(0.96 0.01 80);
-  --primary: oklch(0.9 0.08 75);
-  --primary-foreground: oklch(0.2 0.03 55);
-  --secondary: oklch(0.27 0.025 55);
-  --secondary-foreground: oklch(0.96 0.01 80);
-  --muted: oklch(0.27 0.02 55);
-  --muted-foreground: oklch(0.7 0.02 70);
-  --accent: oklch(0.34 0.05 65);
-  --accent-foreground: oklch(0.96 0.01 80);
-  --destructive: oklch(0.7 0.19 22);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.72 0.11 70);
+  --background: oklch(0.175 0.026 42);
+  --foreground: oklch(0.95 0.016 85);
+  --card: oklch(0.235 0.032 44);
+  --card-foreground: oklch(0.95 0.016 85);
+  --popover: oklch(0.235 0.032 44);
+  --popover-foreground: oklch(0.95 0.016 85);
+  --primary: oklch(0.79 0.165 68);
+  --primary-foreground: oklch(0.19 0.042 42);
+  --secondary: oklch(0.3 0.04 48);
+  --secondary-foreground: oklch(0.95 0.016 85);
+  --muted: oklch(0.285 0.032 46);
+  --muted-foreground: oklch(0.74 0.035 75);
+  --accent: oklch(0.44 0.095 58);
+  --accent-foreground: oklch(0.96 0.018 85);
+  --accent-strong: oklch(0.8 0.15 70);
+  --teal: oklch(0.72 0.105 195);
+  --teal-foreground: oklch(0.18 0.03 42);
+  --destructive: oklch(0.68 0.185 25);
+  --border: oklch(0.34 0.035 50);
+  --border-strong: oklch(0.56 0.048 58);
+  --input: oklch(0.34 0.035 50);
+  --ring: oklch(0.72 0.14 62);
+
+  --shadow-warm-sm: 0 1px 2px oklch(0 0 0 / 0.4);
+  --shadow-warm: 0 4px 16px -4px oklch(0 0 0 / 0.5);
+  --shadow-warm-lg: 0 16px 40px -12px oklch(0 0 0 / 0.6);
+  --shadow-glow: 0 8px 32px -8px oklch(0.79 0.165 68 / 0.35);
 }
 
 @layer base {
@@ -83,7 +116,7 @@
   }
 
   html {
-    @apply font-sans;
+    @apply scroll-smooth font-sans;
   }
 
   body {
@@ -96,3 +129,124 @@
   }
 }
 
+@layer utilities {
+  /* Textura de grano fina: rompe el plano de los fondos grandes sin costo
+     de red, con un SVG de ruido embebido. */
+  .grain::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.5;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.32'/%3E%3C/svg%3E");
+  }
+
+  .dark .grain::before {
+    mix-blend-mode: overlay;
+    opacity: 0.28;
+  }
+
+  .text-gradient-warm {
+    background-image: linear-gradient(
+      100deg,
+      var(--primary) 0%,
+      var(--accent-strong) 55%,
+      var(--accent) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .dark .text-gradient-warm {
+    background-image: linear-gradient(
+      100deg,
+      var(--accent) 0%,
+      var(--accent-strong) 60%,
+      var(--teal) 130%
+    );
+  }
+
+  .shadow-warm-sm {
+    box-shadow: var(--shadow-warm-sm);
+  }
+  .shadow-warm {
+    box-shadow: var(--shadow-warm);
+  }
+  .shadow-warm-lg {
+    box-shadow: var(--shadow-warm-lg);
+  }
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  /* Brillo diagonal que cruza una tarjeta al pasar el cursor. */
+  .sheen {
+    position: relative;
+    overflow: hidden;
+  }
+  .sheen::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      105deg,
+      transparent 35%,
+      oklch(1 0 0 / 0.28) 50%,
+      transparent 65%
+    );
+    transform: translateX(-120%);
+    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .group:hover .sheen::after,
+  .sheen:hover::after {
+    transform: translateX(120%);
+  }
+
+  @keyframes float-slow {
+    0%,
+    100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-14px) rotate(2deg);
+    }
+  }
+  .animate-float {
+    animation: float-slow 7s ease-in-out infinite;
+  }
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  .animate-marquee {
+    animation: marquee 32s linear infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-float,
+  .animate-marquee {
+    animation: none !important;
+  }
+
+  .sheen::after {
+    display: none;
+  }
+}
