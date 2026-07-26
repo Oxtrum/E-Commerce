@@ -71,6 +71,30 @@ Reglas de integración:
 - El checkout se considera confirmado únicamente cuando la API responde con el estado definitivo del pedido/pago.
 - Los importes, impuestos, descuentos y totales enviados por el navegador no son confiables: la API debe recalcularlos y validarlos.
 
+### Correcciones pendientes de subir a `E-CommerceSaaS-Api`
+
+Se anotan aquí porque ese repositorio no acepta escritura desde la cuenta que
+mantiene este frontend. Los commits existen solo en la copia local y hay parches
+exportados en `../parches-ecommerce-api/`. **Quien obtenga acceso de escritura debe
+subirlos**; hasta entonces, cualquiera que clone `E-CommerceSaaS-Api` desde su origin
+recibe la version sin corregir.
+
+| Correccion | Sintoma sin ella | Urgencia |
+|---|---|---|
+| `ClaimDueEvents`: calificar las columnas del `RETURNING` | La consulta devuelve `column reference "id" is ambiguous` en **todas** las llamadas. Es la unica que usa `cmd/integracion-outbox`, asi que el worker de reintentos nunca reclama un evento | Baja hoy, alta en produccion |
+| CORS: emitir cabeceras en el preflight | El `OPTIONS` responde `204` sin cabeceras `Access-Control-*` y el navegador bloquea la peticion real. El `204` engaña: parece que el preflight paso | Media |
+| `.gitignore`: ignorar los binarios de `cmd/` | `integracion-outbox` son 26 MB de ELF sin cubrir por las reglas actuales | Baja |
+
+Sobre la urgencia del primero: verificado contra la base, los seis eventos de
+integracion existentes estan en `procesado`, ninguno en `reintentable`. El fallo
+nunca se ha manifestado porque todas las llamadas a Inventario salieron bien a la
+primera. Importa el dia que una falle por red: el evento queda en `reintentable` y
+nadie lo drena, lo que deja una reserva sin confirmar y un pedido colgado.
+
+Mientras la correccion de CORS no este subida, se puede evitar por completo con un
+proxy de desarrollo en `vite.config.ts` (`server.proxy`), que convierte la peticion
+en same-origin y elimina el preflight.
+
 ## Stack base
 
 Se conserva el stack de `Inventarios-Front`:
