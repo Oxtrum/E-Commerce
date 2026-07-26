@@ -71,29 +71,79 @@ Reglas de integración:
 - El checkout se considera confirmado únicamente cuando la API responde con el estado definitivo del pedido/pago.
 - Los importes, impuestos, descuentos y totales enviados por el navegador no son confiables: la API debe recalcularlos y validarlos.
 
-### Correcciones pendientes de subir a `E-CommerceSaaS-Api`
+### Fallos conocidos de `E-CommerceSaaS-Api`
 
-Se anotan aquí porque ese repositorio no acepta escritura desde la cuenta que
-mantiene este frontend. Los commits existen solo en la copia local y hay parches
-exportados en `../parches-ecommerce-api/`. **Quien obtenga acceso de escritura debe
-subirlos**; hasta entonces, cualquiera que clone `E-CommerceSaaS-Api` desde su origin
-recibe la version sin corregir.
+Dos problemas que aparecen al levantar el ecosistema. Si te topas con alguno, aqui
+esta el diagnostico y la correccion.
 
-| Correccion | Sintoma sin ella | Urgencia |
-|---|---|---|
-| `ClaimDueEvents`: calificar las columnas del `RETURNING` | La consulta devuelve `column reference "id" is ambiguous` en **todas** las llamadas. Es la unica que usa `cmd/integracion-outbox`, asi que el worker de reintentos nunca reclama un evento | Baja hoy, alta en produccion |
-| CORS: emitir cabeceras en el preflight | El `OPTIONS` responde `204` sin cabeceras `Access-Control-*` y el navegador bloquea la peticion real. El `204` engaña: parece que el preflight paso | Media |
-| `.gitignore`: ignorar los binarios de `cmd/` | `integracion-outbox` son 26 MB de ELF sin cubrir por las reglas actuales | Baja |
+#### El navegador bloquea las peticiones por CORS
 
-Sobre la urgencia del primero: verificado contra la base, los seis eventos de
-integracion existentes estan en `procesado`, ninguno en `reintentable`. El fallo
-nunca se ha manifestado porque todas las llamadas a Inventario salieron bien a la
-primera. Importa el dia que una falle por red: el evento queda en `reintentable` y
-nadie lo drena, lo que deja una reserva sin confirmar y un pedido colgado.
+Sintoma: el preflight `OPTIONS` responde `204` y aun asi la peticion real se bloquea.
+El `204` engaña — parece que el preflight paso.
 
-Mientras la correccion de CORS no este subida, se puede evitar por completo con un
-proxy de desarrollo en `vite.config.ts` (`server.proxy`), que convierte la peticion
-en same-origin y elimina el preflight.
+Causa: cuando el origen no esta permitido, el middleware igual aborta el `OPTIONS`
+con `204` pero sin emitir ninguna cabecera `Access-Control-*`.
+
+Diagnostico en una linea. Si no imprime nada, ese origen esta rechazado:
+
+```bash
+curl -s -i -X OPTIONS http://localhost:3001/api/auth/login \
+  -H "Origin: http://localhost:3051" \
+  -H "Access-Control-Request-Method: POST" | grep -i access-control-allow-origin
+```
+
+Ordenado por frecuencia:
+
+1. **La API corre codigo viejo.** Go compila al arrancar; editar el middleware no
+   cambia nada hasta reiniciar el proceso. Comprueba con `ss -ltnp | grep :3001`.
+2. **El origen no coincide.** Para el navegador `localhost:3051` y `127.0.0.1:3051`
+   son origenes distintos, y Vite tambien escucha en `[::1]`.
+3. `CORS_ALLOWED_ORIGINS` no incluye el puerto del frontend.
+
+Corregir en `internal/http/middleware/operational.go`: normalizar el origen antes de
+compararlo y aceptar los tres nombres de loopback. Esa regla por prefijo, junto con
+`Access-Control-Allow-Credentials`, debe quedar condicionada al entorno antes de
+desplegar: en produccion permitiria que cualquier aplicacion web corriendo en la
+maquina del usuario haga peticiones autenticadas y lea la respuesta.
+
+**Alternativa sin tocar la API:** un proxy de desarrollo en `vite.config.ts` convierte
+la peticion en same-origin y elimina el preflight por completo.
+
+```ts
+server: {
+  port: 3051,
+  proxy: { "/api": { target: "http://localhost:3001", changeOrigin: true } },
+},
+```
+
+Con eso, `VITE_API_URL=/api` en `.env.local`.
+
+#### El worker de outbox no procesa nada
+
+Sintoma: `cmd/integracion-outbox` corre pero nunca reclama un evento. Los que quedan
+en estado `reintentable` se acumulan indefinidamente.
+
+Causa: `ClaimDueEvents` usa un CTE llamado `due` y actualiza la tabla con el alias
+`event` en el mismo statement. Las columnas sin prefijo del `RETURNING` quedan
+ambiguas y PostgreSQL aborta con `column reference "id" is ambiguous` — en **todas**
+las llamadas, no de forma intermitente.
+
+Comprobarlo:
+
+```bash
+psql "$DATABASE_URL" -c "SELECT estado, count(*) FROM integraciones_inventario_eventos GROUP BY estado"
+```
+
+Si hay filas en `reintentable` o `pendiente` que no avanzan, es esto.
+
+Corregir en `internal/modules/integracioninventario/repository.go`: calificar cada
+columna del `RETURNING` con la tabla, por ejemplo mediante un
+`eventColumnsWithPrefix("event")` junto al `eventColumns()` existente.
+
+No afecta al camino feliz: el checkout llama a Inventario de forma sincrona y
+funciona igual. Lo que se pierde es la recuperacion cuando una llamada falla por red
+— el evento queda sin drenar, y eso deja una reserva sin confirmar y un pedido
+colgado.
 
 ## Stack base
 
