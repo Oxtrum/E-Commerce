@@ -1,10 +1,11 @@
 import { Package, ShoppingCart } from "lucide-react"
+import { Link } from "react-router-dom"
 
-import type { CatalogoProducto } from "@/types/catalogo"
+import type { CatalogProduct } from "@/types/catalog"
 import { cn, formatCurrency } from "@/lib/utils"
 
 interface ProductCardProps {
-  producto: CatalogoProducto
+  producto: CatalogProduct
   prioridad?: boolean
 }
 
@@ -20,7 +21,7 @@ function etiquetaStock(
 }
 
 export function ProductCard({ producto, prioridad = false }: ProductCardProps) {
-  const stock = etiquetaStock(producto.stockVisible)
+  const stock = etiquetaStock(producto.stockVisible ?? null)
   const agotado = stock?.tono === "agotado"
 
   return (
@@ -64,9 +65,8 @@ export function ProductCard({ producto, prioridad = false }: ProductCardProps) {
         )}
 
         {/* acción que emerge al pasar el cursor; en móvil siempre visible */}
-        <button
-          type="button"
-          disabled={agotado}
+        <Link
+          to={`/producto/${encodeURIComponent(producto.slug)}`}
           className={cn(
             "absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-2 text-xs font-semibold text-primary-foreground shadow-warm",
             "transition-all duration-300 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
@@ -76,9 +76,9 @@ export function ProductCard({ producto, prioridad = false }: ProductCardProps) {
           )}
         >
           <ShoppingCart aria-hidden="true" className="size-3.5" />
-          {agotado ? "Agotado" : "Agregar"}
+          Ver opciones
           <span className="sr-only"> — {producto.nombre}</span>
-        </button>
+        </Link>
       </div>
 
       <div className="flex flex-1 flex-col gap-1 p-4">

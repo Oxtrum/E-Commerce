@@ -14,7 +14,8 @@ import {
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
-import { useCatalogo } from "@/hooks/useCatalogo"
+import { useCatalog } from "@/hooks/useCatalog"
+import { useOrganization } from "@/context/organization-provider"
 import { ProductCard } from "@/components/store/ProductCard"
 import { HeroArt } from "@/components/store/HeroArt"
 import { Reveal } from "@/components/store/Reveal"
@@ -120,6 +121,7 @@ const PREGUNTAS: readonly Pregunta[] = [
 ]
 
 export default function HomePage() {
+  const { organization } = useOrganization()
   const [busqueda, setBusqueda] = useState("")
   const [consulta, setConsulta] = useState("")
 
@@ -128,7 +130,10 @@ export default function HomePage() {
     return () => clearTimeout(timeout)
   }, [busqueda])
 
-  const { data, isLoading } = useCatalogo({
+  const { data, isLoading } = useCatalog({
+    ...(organization?.slug
+      ? { organizacionSlug: organization.slug }
+      : { organizacionCodigo: organization?.codigo }),
     nombre: consulta || undefined,
     limit: 8,
   })
