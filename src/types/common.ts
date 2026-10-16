@@ -3,6 +3,7 @@ export interface ApiResponse<T> {
   codigo: number
   error: boolean
   mensaje: string
+  version: string
 }
 
 export interface PaginationParams {
@@ -13,7 +14,6 @@ export interface PaginationParams {
 export interface PaginationMetadata {
   limit: number
   offset: number
-  count: number
   total: number
   hasMore: boolean
 }
@@ -22,4 +22,3 @@ export interface PaginatedData<T> {
   items: T[]
   pagination: PaginationMetadata
 }
-
